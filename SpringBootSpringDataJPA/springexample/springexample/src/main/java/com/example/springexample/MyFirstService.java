@@ -1,16 +1,29 @@
 package com.example.springexample;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MyFirstService {
 
+    //@Autowired
+    //@Qualifier("mySecondClass")
+    //@Qualifier("bean1")
+    private MyFirstClass myFirstClass;
 
-    private final MyFirstClass myFirstClass;
+    //@Autowired
+//    public MyFirstService( //@Qualifier("bean2")
+//                           MyFirstClass myFirstClass) {
+//        this.myFirstClass = myFirstClass;
+//    }
+//    @Autowired
+//    public void injectDependencies(@Qualifier("mySecondClass") MyFirstClass myFirstClass) {
+//        this.myFirstClass = myFirstClass;
+//    }
 
     @Autowired
-    public MyFirstService(MyFirstClass myFirstClass) {
+    public void setMyFirstClass(@Qualifier("mySecondClass") MyFirstClass myFirstClass) {
         this.myFirstClass = myFirstClass;
     }
 
