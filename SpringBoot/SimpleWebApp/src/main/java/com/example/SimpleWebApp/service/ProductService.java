@@ -22,4 +22,27 @@ public class ProductService {
     public void addProduct(Product prod) {
         products.add(prod);
     }
+
+    public void updateProduct(Product prod) {
+        int index = -1;
+        for (int i = 0; i < products.size(); i++)
+            if (products.get(i).getProdId() == prod.getProdId())
+                index = i;
+        if(index>=0){
+            products.set(index, prod);
+        }
+
+
+
+    }
+
+    public void deleteProduct(int prodId) {
+        int index = -1;
+        for (int i = 0; i < products.size(); i++)
+            if (products.get(i).getProdId() == prodId)
+                index = i;
+        if(index>=0)
+            products.remove(index);
+
+    }
 }
