@@ -1,8 +1,6 @@
 package com.example.BookingSystem.service;
 
-import com.example.BookingSystem.dto.LoginUserDto;
-import com.example.BookingSystem.dto.RegisterUserDto;
-import com.example.BookingSystem.dto.VerifyUserDto;
+import com.example.BookingSystem.dto.*;
 import com.example.BookingSystem.model.User;
 import com.example.BookingSystem.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -136,5 +134,62 @@ public class AuthenticationService {
         Random random = new Random();
         int code = random.nextInt(900000) + 100000;
         return String.valueOf(code);
+    }
+
+    public void requestPasswordReset(RequestPasswordResetDto input) {
+        Optional<User> optionalUser  = userRepository.findByEmail(input.getEmail());
+        if (optionalUser .isPresent()) {
+            User user = optionalUser .get();
+            String resetCode = generateVerificationCode(); // You can use a different method for better uniqueness
+            user.setVerificationCode(resetCode);
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            userRepository.save(user);
+            sendPasswordResetEmail(user, resetCode);
+        } else {
+            throw new RuntimeException("User  not found");
+        }
+    }
+
+    private void sendPasswordResetEmail(User user, String resetCode) {
+        String subject = "Password Reset Request";
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Password Reset Request</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the following code to reset your password:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Reset Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + resetCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
+    public void resetPassword(ResetPasswordDto input) {
+        Optional<User> optionalUser  = userRepository.findByEmail(input.getEmail());
+        if (optionalUser .isPresent()) {
+            User user = optionalUser .get();
+            if (user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Reset code has expired");
+            }
+            if (user.getVerificationCode().equals(input.getResetCode())) {
+                user.setPassword(passwordEncoder.encode(input.getNewPassword()));
+                user.setVerificationCode(null); // Clear the reset code after use
+                user.setVerificationCodeExpiresAt(null);
+                userRepository.save(user);
+            } else {
+                throw new RuntimeException("Invalid reset code");
+            }
+        } else {
+            throw new RuntimeException("User  not found");
+        }
     }
 }

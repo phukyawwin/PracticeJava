@@ -1,7 +1,5 @@
 package com.example.BookingSystem.controller;
-import com.example.BookingSystem.dto.LoginUserDto;
-import com.example.BookingSystem.dto.RegisterUserDto;
-import com.example.BookingSystem.dto.VerifyUserDto;
+import com.example.BookingSystem.dto.*;
 import com.example.BookingSystem.model.User;
 import com.example.BookingSystem.responses.LoginResponse;
 import com.example.BookingSystem.service.AuthenticationService;
@@ -42,6 +40,17 @@ public class AuthenticationController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    @PostMapping("/request-password-reset")
+    public ResponseEntity<String> requestPasswordReset(@RequestBody RequestPasswordResetDto request) {
+        authenticationService.requestPasswordReset(request);
+        return ResponseEntity.ok("Password reset email sent successfully.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetRequest) {
+        authenticationService.resetPassword(resetRequest);
+        return ResponseEntity.ok("Password has been reset successfully.");
     }
 
     @PostMapping("/resend")
