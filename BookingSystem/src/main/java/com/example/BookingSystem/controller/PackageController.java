@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,16 +41,20 @@ public class PackageController {
     }
 
     @PostMapping("/purchase")
-    public void purchasePackage(@RequestParam Long userId, @RequestParam Long packageId) {
+    public void purchasePackage( @RequestParam Long packageId) {
         // Fetch user and package by IDs
-        User user = userRepository.findById(userId).orElseThrow();
-        Package pkg = packageRepository.findById(packageId).orElseThrow();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        User user = userRepository.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("User  not found"));
+        Package pkg = packageRepository.findById(packageId).orElseThrow(() -> new RuntimeException("Package not found"));
         packageService.purchasePackage(user, pkg);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<UserPackage> getUserPackages(@PathVariable Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+    @GetMapping("/purchasedByuser")
+    public List<UserPackage> getUserPackages() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        User user = userRepository.findById(currentUser.getId()).orElseThrow();
         return packageService.getUserPackages(user);
     }
     @PostMapping("/add")

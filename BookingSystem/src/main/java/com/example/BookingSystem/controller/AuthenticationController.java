@@ -53,13 +53,13 @@ public class AuthenticationController {
         return ResponseEntity.ok("Password has been reset successfully.");
     }
 
-    @PostMapping("/resend")
-    public ResponseEntity<?> resendVerificationCode(@RequestParam String email) {
-        try {
-            authenticationService.resendVerificationCode(email);
-            return ResponseEntity.ok("Verification code sent");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+//    @PostMapping("/resend")
+//    public ResponseEntity<?> resendVerificationCode(@RequestParam String email) {
+//        try {
+//            authenticationService.resendVerificationCode(email);
+//            return ResponseEntity.ok("Verification code sent");
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
 }
