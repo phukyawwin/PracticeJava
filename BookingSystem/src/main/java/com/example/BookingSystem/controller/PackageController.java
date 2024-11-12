@@ -5,9 +5,12 @@ import com.example.BookingSystem.model.UserPackage;
 import com.example.BookingSystem.repository.PackageRepository;
 import com.example.BookingSystem.repository.UserPackageRepository;
 import com.example.BookingSystem.repository.UserRepository;
+import com.example.BookingSystem.service.GeoLocationService;
 import com.example.BookingSystem.service.PackageService;
 import com.example.BookingSystem.model.Package;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +30,8 @@ public class PackageController {
 
     @Autowired
     private UserPackageRepository userPackageRepository;
-
+    @Autowired
+    private GeoLocationService geoLocationService;
 
     @GetMapping("/{country}")
     public List<Package> getPackages(@PathVariable String country) {
@@ -51,5 +55,24 @@ public class PackageController {
     public ResponseEntity<Package> addPackage(@RequestBody Package pkg) {
         Package createdPackage = packageService.addPackage(pkg);
         return ResponseEntity.ok(createdPackage);
+    }
+
+    @GetMapping("/byip/{publicIp}")
+    public ResponseEntity<List<Package>> getPackageByIp(@PathVariable String publicIp,HttpServletRequest request) {
+        try {
+            String country = geoLocationService.getCountryByIp(publicIp);
+
+            return ResponseEntity.ok(packageService.getPackagesByCountry(country));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 }
