@@ -1,12 +1,12 @@
 package com.example.BookingSystem.controller;
+import com.example.BookingSystem.dto.ChangePasswordDto;
 import com.example.BookingSystem.model.User;
+import com.example.BookingSystem.service.AuthenticationService;
 import com.example.BookingSystem.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,8 +14,10 @@ import java.util.List;
 @RestController
 public class UserController {
     private final UserService userService;
-    public UserController(UserService userService) {
+    private final AuthenticationService authenticationService;
+    public UserController(UserService userService, AuthenticationService authenticationService) {
         this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @GetMapping("/me")
@@ -29,5 +31,14 @@ public class UserController {
     public ResponseEntity<List<User>> allUsers() {
         List <User> users = userService.allUsers();
         return ResponseEntity.ok(users);
+    }
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser  = (User ) authentication.getPrincipal();
+        Long userId = currentUser .getId(); // Assuming User has a getId method
+        System.out.println("Heere"+userId);
+        authenticationService.changePassword(userId, changePasswordDto.getOldPassword(), changePasswordDto.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
