@@ -31,7 +31,7 @@ public class ClassScheduleController {
         return ResponseEntity.ok(classSchedules);
     }
 
-    @GetMapping("/byUser")
+    @GetMapping("/classesByUserCountry")
     public List<ClassSchedule> getClassesByCountry() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();

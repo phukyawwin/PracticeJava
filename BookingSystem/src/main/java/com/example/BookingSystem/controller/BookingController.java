@@ -44,7 +44,7 @@ public class BookingController {
     }
 
     // Endpoint to get all bookings for a user
-    @GetMapping("/userBooking")
+    @GetMapping("/bookByUser")
     public ResponseEntity<List<Booking>> getUserBookings() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();

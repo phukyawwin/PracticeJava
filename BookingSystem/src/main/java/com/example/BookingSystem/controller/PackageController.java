@@ -50,20 +50,20 @@ public class PackageController {
         packageService.purchasePackage(user, pkg);
     }
 
-    @GetMapping("/purchasedByuser")
+    @GetMapping("/getUserPackagesList")
     public List<UserPackage> getUserPackages() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         return packageService.getUserPackages(user);
     }
-    @PostMapping("/add")
+    @PostMapping("/addNewPackage")
     public ResponseEntity<Package> addPackage(@RequestBody Package pkg) {
         Package createdPackage = packageService.addPackage(pkg);
         return ResponseEntity.ok(createdPackage);
     }
 
-    @GetMapping("/byip/{publicIp}")
+    @GetMapping("/getPackageByIp/{publicIp}")
     public ResponseEntity<List<Package>> getPackageByIp(@PathVariable String publicIp,HttpServletRequest request) {
         try {
             String country = geoLocationService.getCountryByIp(publicIp);

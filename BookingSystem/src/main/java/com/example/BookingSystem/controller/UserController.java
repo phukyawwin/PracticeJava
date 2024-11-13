@@ -37,7 +37,6 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser  = (User ) authentication.getPrincipal();
         Long userId = currentUser .getId(); // Assuming User has a getId method
-        System.out.println("Heere"+userId);
         authenticationService.changePassword(userId, changePasswordDto.getOldPassword(), changePasswordDto.getNewPassword());
         return ResponseEntity.ok("Password changed successfully");
     }
